@@ -1,0 +1,679 @@
+---
+const { trackId } = Astro.params;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotify Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main id="app" data-track-id={trackId}>
+      <!-- Login Screen -->
+      <div id="login-screen" class="screen">
+        <div class="login-container">
+          <div class="logo">
+            <!-- svg omitted for brevity -->
+          </div>
+          <h1>Spotify Player</h1>
+          <p>Connect to control your music</p>
+          <button id="login-btn" class="btn-primary"
+            >Connect with Spotify</button
+          >
+          <p class="note">Requires Spotify Premium</p>
+        </div>
+      </div>
+
+      <!-- Player Screen -->
+      <div id="player-screen" class="screen hidden">
+        <div class="player-container">
+          <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span id="status-text">Connecting...</span>
+          </div>
+
+          <div class="player-visual">
+            <div class="vinyl-container">
+              <div id="vinyl" class="vinyl">
+                <div class="vinyl-inner"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="shuffle-btn" class="control-btn small" title="Shuffle">
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
+                <path
+                  d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"
+                ></path>
+              </svg>
+            </button>
+
+            <button id="prev-btn" class="control-btn" title="Previous">
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6l-8.5 6z"></path>
+              </svg>
+            </button>
+
+            <button id="play-btn" class="control-btn play" title="Play/Pause">
+              <svg
+                id="play-icon"
+                viewBox="0 0 24 24"
+                width="32"
+                height="32"
+                fill="currentColor"
+              >
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+              <svg
+                id="pause-icon"
+                class="hidden"
+                viewBox="0 0 24 24"
+                width="32"
+                height="32"
+                fill="currentColor"
+              >
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+              </svg>
+            </button>
+
+            <button id="next-btn" class="control-btn" title="Next">
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"></path>
+              </svg>
+            </button>
+
+            <button id="repeat-btn" class="control-btn small" title="Repeat">
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
+                <path
+                  d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="volume-container">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path
+                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+              ></path>
+            </svg>
+            <input
+              type="range"
+              id="volume-slider"
+              min="0"
+              max="100"
+              value="50"
+              class="volume-slider"
+            />
+          </div>
+
+          <button id="disconnect-btn" class="btn-secondary">Disconnect</button>
+        </div>
+      </div>
+    </main>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: #fff;
+      }
+
+      #app {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .screen {
+        width: 100%;
+        max-width: 400px;
+        padding: 2rem;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Login Screen */
+      .login-container {
+        text-align: center;
+      }
+
+      .logo {
+        color: #1db954;
+        margin-bottom: 1.5rem;
+      }
+
+      .login-container h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .login-container p {
+        color: #a0a0a0;
+        margin-bottom: 2rem;
+      }
+
+      .btn-primary {
+        background: #1db954;
+        color: #fff;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+      }
+
+      .btn-primary:hover {
+        background: #1ed760;
+        transform: scale(1.02);
+      }
+
+      .note {
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 1rem;
+      }
+
+      /* Player Screen */
+      .player-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #1db954;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .status-dot.error {
+        background: #e74c3c;
+        animation: none;
+      }
+
+      #status-text {
+        font-size: 0.875rem;
+        color: #a0a0a0;
+      }
+
+      /* Vinyl Animation */
+      .player-visual {
+        padding: 2rem 0;
+      }
+
+      .vinyl-container {
+        position: relative;
+      }
+
+      .vinyl {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          #1a1a1a 0%,
+          #2a2a2a 50%,
+          #1a1a1a 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+          0 0 0 3px #333,
+          0 0 0 6px #222,
+          0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .vinyl.spinning {
+        animation: spin 2s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .vinyl-inner {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1db954 0%, #169c46 100%);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Controls */
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .control-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+        transition: all 0.2s ease;
+      }
+
+      .control-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+      }
+
+      .control-btn.small {
+        width: 40px;
+        height: 40px;
+        background: transparent;
+        color: #666;
+      }
+
+      .control-btn.small:hover {
+        color: #fff;
+        background: transparent;
+      }
+
+      .control-btn.small.active {
+        color: #1db954;
+      }
+
+      .control-btn.play {
+        width: 64px;
+        height: 64px;
+        background: #1db954;
+      }
+
+      .control-btn.play:hover {
+        background: #1ed760;
+      }
+
+      /* Volume */
+      .volume-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        color: #666;
+      }
+
+      .volume-slider {
+        flex: 1;
+        height: 4px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        outline: none;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        cursor: pointer;
+        transition: transform 0.1s ease;
+      }
+
+      .volume-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #a0a0a0;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-secondary:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        color: #fff;
+      }
+    </style>
+
+    <script is:inline>
+      // Removed client secret/client id from frontend — handled server-side in SSR.
+      // Global variables for Spotify player
+      let player = null;
+      let isPlaying = false;
+      let accessToken = null; // will hold the resolved string token
+      let sdkReady = false;
+      const trackId = document.getElementById('app').dataset.trackId;
+
+      // Fetch token from server endpoint. Returns a string token or null.
+      async function getAccessToken() {
+        try {
+          const res = await fetch("/api/spotify/token");
+          if (!res.ok) return null;
+          const data = await res.json();
+          // support both possible shapes: { token } or { accessToken }
+          return data.token || data.accessToken || null;
+        } catch (err) {
+          console.error("getAccessToken error:", err);
+          return null;
+        }
+      }
+
+      // Disconnect player
+      function disconnect() {
+        if (player) {
+          player.disconnect();
+          player = null;
+        }
+        accessToken = null;
+        // clearing server-side cookie would be better via an API call; here just flip UI
+        document.getElementById("player-screen").classList.add("hidden");
+        document.getElementById("login-screen").classList.remove("hidden");
+      }
+
+      // Transfer playback to this device
+      async function transferPlayback(deviceId, token) {
+        try {
+          await fetch("https://api.spotify.com/v1/me/player", {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              device_ids: [deviceId],
+              play: false,
+            }),
+          });
+          console.log("Playback transferred");
+        } catch (error) {
+          console.error("Transfer failed:", error);
+        }
+      }
+
+      // Initialize Spotify Player — expects a resolved token string
+      function initializePlayer(token) {
+        if (!token) {
+          console.error("initializePlayer called without token");
+          return;
+        }
+
+        console.log("Initializing player with token");
+
+        const statusText = document.getElementById("status-text");
+        const statusDot = document.querySelector(".status-dot");
+        const vinyl = document.getElementById("vinyl");
+        const playIcon = document.getElementById("play-icon");
+        const pauseIcon = document.getElementById("pause-icon");
+
+        player = new Spotify.Player({
+          name: "Astro Spotify Player",
+          // getOAuthToken must be synchronous from our perspective (we give it resolved token)
+          getOAuthToken: (cb) => {
+            cb(token); // pass raw string only
+          },
+          volume: 0.5,
+        });
+
+        // Ready
+        player.addListener("ready", async ({ device_id }) => {
+          console.log("Player ready with device ID:", device_id);
+          deviceId = device_id;
+          statusText.textContent = "Ready to play";
+          statusDot.classList.remove("error");
+          
+          if (trackId) {
+            await playTrack(device_id, token, trackId);
+          } else {
+            // add a short delay to allow Spotify internal initialization stability
+            setTimeout(() => transferPlayback(device_id, token), 300);
+          }
+
+          console.log("Playback started");
+        });
+
+        async function playTrack(deviceId, token, trackId) {
+          const playUrl = `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`;
+
+          const body = {
+            uris: [`spotify:track:${trackId}`],
+          };
+
+          try {
+            const response = await fetch(playUrl, {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(body),
+            });
+
+            if (response.status === 204) {
+              console.log("Playback started successfully");
+            } else {
+              const errorData = await response.json();
+              console.error("Failed to start playback", errorData);
+            }
+          } catch (error) {
+            console.error("Error playing track", error);
+          }
+        }
+
+        // Not Ready
+        player.addListener("not_ready", ({ device_id }) => {
+          console.log("Device not ready");
+          statusText.textContent = "Device offline";
+          statusDot.classList.add("error");
+        });
+
+        // Player state changed
+        player.addListener("player_state_changed", (state) => {
+          if (!state) return;
+
+          isPlaying = !state.paused;
+
+          if (isPlaying) {
+            playIcon.classList.add("hidden");
+            pauseIcon.classList.remove("hidden");
+            vinyl.classList.add("spinning");
+            statusText.textContent = "Playing";
+          } else {
+            playIcon.classList.remove("hidden");
+            pauseIcon.classList.add("hidden");
+            vinyl.classList.remove("spinning");
+            statusText.textContent = "Paused";
+          }
+        });
+
+        // Errors
+        player.addListener("initialization_error", ({ message }) => {
+          console.error("Init error:", message);
+          statusText.textContent = "Init error";
+          statusDot.classList.add("error");
+        });
+
+        player.addListener("authentication_error", ({ message }) => {
+          console.error("Auth error:", message);
+          statusText.textContent = "Auth error";
+          statusDot.classList.add("error");
+          setTimeout(() => disconnect(), 2000);
+        });
+
+        player.addListener("account_error", ({ message }) => {
+          console.error("Account error:", message);
+          statusText.textContent = "Premium required";
+          statusDot.classList.add("error");
+        });
+
+        player.connect().then((success) => {
+          console.log("Player connected:", success);
+        });
+      }
+
+      // SDK callback — mark sdkReady and initialize if we already have token
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        console.log("Spotify SDK Ready");
+        sdkReady = true;
+        if (accessToken && !player) {
+          initializePlayer(accessToken);
+        }
+      };
+
+      // Boot sequence: wait for DOM, then fetch token, update UI, and init player if SDK ready.
+      async function initApp() {
+        const loginScreen = document.getElementById("login-screen");
+        const playerScreen = document.getElementById("player-screen");
+        const loginBtn = document.getElementById("login-btn");
+        const disconnectBtn = document.getElementById("disconnect-btn");
+        const playBtn = document.getElementById("play-btn");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const shuffleBtn = document.getElementById("shuffle-btn");
+        const repeatBtn = document.getElementById("repeat-btn");
+        const volumeSlider = document.getElementById("volume-slider");
+
+        // Event Listeners
+        loginBtn.addEventListener("click", () => {
+          // server-side login endpoint (no client secret)
+          window.location.href = "/api/spotify/login?state=" + encodeURIComponent(trackId);
+        });
+        disconnectBtn.addEventListener("click", disconnect);
+
+        playBtn?.addEventListener("click", () => {
+          if (player) player.togglePlay();
+        });
+
+        prevBtn?.addEventListener("click", () => {
+          if (player) player.previousTrack();
+        });
+
+        nextBtn?.addEventListener("click", () => {
+          if (player) player.nextTrack();
+        });
+
+        shuffleBtn?.addEventListener("click", function () {
+          this.classList.toggle("active");
+        });
+
+        repeatBtn?.addEventListener("click", function () {
+          this.classList.toggle("active");
+        });
+
+        volumeSlider?.addEventListener("input", (e) => {
+          const volume = e.target.value / 100;
+          if (player) player.setVolume(volume);
+        });
+
+        // IMPORTANT: resolve token here (await) so accessToken is a string, not a Promise
+        const token = await getAccessToken();
+        accessToken = token; // resolved string or null
+
+        if (accessToken) {
+          console.log("Token found, showing player screen");
+          loginScreen.classList.add("hidden");
+          playerScreen.classList.remove("hidden");
+
+          // Initialize immediately if SDK is ready
+          if (sdkReady) {
+            console.log("SDK already loaded, initializing");
+            initializePlayer(accessToken);
+          } else {
+            console.log("Waiting for SDK to load...");
+          }
+        } else {
+          console.log("No token, showing login screen");
+          loginScreen.classList.remove("hidden");
+          playerScreen.classList.add("hidden");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", initApp);
+    </script>
+
+    <!-- Load Spotify SDK AFTER our callback is defined -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+  </body>
+</html>
