@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-export const GET: APIRoute = async ({ url, request, cookies }) => {
+export const GET: APIRoute = async ({ url, request, cookies, redirect }) => {
   const code = url.searchParams.get("code");
 
   const state = url.searchParams.get("state");
@@ -40,5 +40,5 @@ export const GET: APIRoute = async ({ url, request, cookies }) => {
   });
 
   const redirectUrl = new URL(`/track/${state}`, request.url);
-  return Response.redirect(redirectUrl.toString(), 302);
+  return redirect(redirectUrl.toString(), 302);
 }
