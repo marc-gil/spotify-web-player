@@ -1,0 +1,64 @@
+---
+import NeonTitle from '../NeonTitle.astro';
+import SpotifyLogo from './SpotifyLogo.astro';
+
+interface Props {
+  state: string;
+}
+
+const { state } = Astro.props;
+---
+
+<link href="https://fonts.cdnfonts.com/css/neon-lights" rel="stylesheet" />
+<section class="screen">
+  <div class="logo">
+    <SpotifyLogo/>
+  </div>
+  <NeonTitle text="PACHEHITSTER"/>
+  <p>Connectat a Spotify per controlar la musica</p>
+  <a href={`/api/spotify/login?state=${encodeURIComponent(state)}`}>
+    Connecta amb Spotify
+  </a>
+  <p class="note">Es requereix Spotify Premium</p>
+</section>
+
+<style>
+  section {
+    text-align: center;
+  }
+
+  p {
+    color: #a0a0a0;
+    margin-bottom: 2rem;
+  }
+
+  a {
+    display: inline-block;
+    background: #1db954;
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  a:hover {
+    background: #1ed760;
+    transform: scale(1.02);
+  }
+
+  .logo {
+    color: #1db954;
+    margin-bottom: 1rem;
+  }
+
+  .note {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 1rem;
+  }
+</style>

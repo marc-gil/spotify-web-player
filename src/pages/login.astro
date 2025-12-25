@@ -1,0 +1,21 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LoginSection from "../components/login/LoginSection.astro";
+
+const from = Astro.url.searchParams.get("from")!;
+---
+
+<Layout>
+  <main id="app">
+    <LoginSection state={from} />
+  </main>
+</Layout>
+
+<style>
+  #app {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>

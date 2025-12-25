@@ -39,6 +39,6 @@ export const GET: APIRoute = async ({ url, request, cookies, redirect }) => {
     maxAge: token.expires_in,
   });
 
-  const redirectUrl = new URL(`/track/${state}`, request.url);
+  const redirectUrl = new URL(`${state}`, request.url);
   return redirect(redirectUrl.toString(), 302);
 }

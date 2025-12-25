@@ -1,0 +1,38 @@
+---
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<h1>{text}</h1>
+
+<style>
+  h1 {
+    font-size: 2.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    --interval: 1s;
+    --color1: #fda9d4;
+    --color2: #fa7bbd;
+    --color3: #d6016f;
+    --color4: #820043;
+    text-shadow:
+      0 0 10px var(--color1),
+      0 0 20px var(--color2),
+      0 0 40px var(--color3),
+      0 0 80px var(--color4);
+    will-change: filter, color;
+    filter: saturate(60%);
+    animation: flicker steps(100) var(--interval) 1s infinite;
+    font-family: "Neon Spark";
+  }
+
+  @keyframes flicker {
+    50% {
+      color: white;
+      filter: saturate(200%) hue-rotate(20deg);
+    }
+  }
+</style>
