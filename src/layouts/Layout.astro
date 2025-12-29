@@ -17,6 +17,7 @@
 		padding: 0;
 		box-sizing: border-box;
 	}
+
 	html,
 	body {
 		margin: 0;
@@ -31,26 +32,28 @@
 			BlinkMacSystemFont,
 			sans-serif;
 		background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
-		min-height: 100vh;
+		min-height: 100dvh;
 		color: #fff;
 	}
 
-  @font-face {
-    font-family: "Neon Spark";
-    src: url("/fonts/neon-spark/Neon Spark.otf") format("opentype");
-    font-weight: normal;
-    font-style: normal;
-    font-display: block;
-  }
+	main {
+		min-height: 100dvh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	@font-face {
+		font-family: "Neon Spark";
+		src: url("/fonts/neon-spark/Neon Spark.otf") format("opentype");
+		font-weight: normal;
+		font-style: normal;
+		font-display: block;
+	}
 
 	.screen {
 		width: 100%;
 		max-width: 400px;
 		padding: 2rem;
 	}
-
-	.hidden {
-		display: none !important;
-	}
-
 </style>

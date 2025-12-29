@@ -1,7 +1,7 @@
 ---
-import NeonTitle from "../../components/NeonTitle.astro";
-import Layout from "../../layouts/Layout.astro";
-import { GET } from "../api/spotify/token";
+import NeonTitle from "@components/NeonTitle.astro";
+import Layout from "@layouts/Layout.astro";
+import { GET } from "@api/spotify/token";
 
 const { trackId } = Astro.params;
 
@@ -19,8 +19,7 @@ if (!json.token) {
 ---
 
 <Layout>
-  <main id="app" data-track-id={trackId}>
-
+  <main data-track-id={trackId}>
     <section id="player-screen" class="screen hidden">
       <div class="player-container">
         <div class="status-indicator">
@@ -28,7 +27,7 @@ if (!json.token) {
           <span id="status-text">Connecting...</span>
         </div>
 
-        <NeonTitle text="PACHEHITSTER"/>
+        <NeonTitle text="PACHEHITSTER" />
 
         <div class="player-visual">
           <div class="vinyl-container">
@@ -110,462 +109,462 @@ if (!json.token) {
       </div>
     </section>
   </main>
+</Layout>
 
-  <style>
-    * {
-      --color-green: #1db954;
-      --color-green-darker: #169c46;
-      --color-blue: #41d1e9;
-      --color-blue-darker: #1f9ccf;
-      --color: var(--color-blue);
-      --color-darker: var(--color-blue-darker);
+<style>
+  * {
+    --color-green: #1db954;
+    --color-green-darker: #169c46;
+    --color-blue: #41d1e9;
+    --color-blue-darker: #1f9ccf;
+    --color: var(--color-blue);
+    --color-darker: var(--color-blue-darker);
+  }
+
+  /* Player Screen */
+  .player-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
     }
-    #app {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .status-dot.error {
+    background: #e74c3c;
+    animation: none;
+  }
+
+  #status-text {
+    font-size: 0.875rem;
+    color: #a0a0a0;
+  }
+
+  /* Vinyl Animation */
+  .player-visual {
+    padding-bottom: 2rem;
+  }
+
+  .vinyl-container {
+    position: relative;
+  }
+
+  .vinyl {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 0 0 3px #333,
+      0 0 0 6px #222,
+      0 20px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .vinyl.spinning {
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .vinyl-inner {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 200%;
+    width: 100px;
+    height: 100px;
+    background-image: url("/marta.jpeg");
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color) 0%, var(--color-darker) 100%);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s ease;
+  }
+
+  .control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  .control-btn.small {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    color: #666;
+  }
+
+  .control-btn.small:hover {
+    color: #fff;
+    background: transparent;
+  }
+
+  .control-btn.small.active {
+    color: var(--color);
+  }
+
+  .control-btn.play {
+    width: 64px;
+    height: 64px;
+    background: var(--color);
+  }
+
+  .control-btn.play:hover {
+    background: var(--color);
+  }
+
+  /* Volume */
+  .volume-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    color: #666;
+  }
+
+  .volume-slider {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #a0a0a0;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+</style>
+
+<script>
+  let player: Spotify.Player | null = null;
+  let isPlaying: boolean = false;
+  let accessToken: string | null = null;
+  let sdkReady = false;
+  const trackId = document.getElementsByTagName("main")[0].dataset.trackId;
+
+  // Fetch token from server endpoint. Returns a string token or null.
+  async function getAccessToken() {
+    try {
+      const res = await fetch("/api/spotify/token");
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.token || data.accessToken || null;
+    } catch (err) {
+      console.error("getAccessToken error:", err);
+      return null;
+    }
+  }
+
+  // Disconnect player
+  function disconnect() {
+    if (player) {
+      player.disconnect();
+      player = null;
+    }
+    accessToken = null;
+    window.location.href = "/login?from=/track/" + trackId;
+  }
+
+  // Transfer playback to this device
+  async function transferPlayback(deviceId: string, token: string) {
+    try {
+      await fetch("https://api.spotify.com/v1/me/player", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          device_ids: [deviceId],
+          play: false,
+        }),
+      });
+      console.log("Playback transferred");
+    } catch (error) {
+      console.error("Transfer failed:", error);
+    }
+  }
+
+  // Initialize Spotify Player — expects a resolved token string
+  function initializePlayer(token: string) {
+    if (!token) {
+      console.error("initializePlayer called without token");
+      return;
     }
 
-    /* Player Screen */
-    .player-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-    }
+    console.log("Initializing player with token");
 
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 50px;
-    }
+    const statusText = document.getElementById("status-text")!;
+    const statusDot = document.querySelector(".status-dot")!;
+    const vinyl = document.getElementById("vinyl")!;
+    const playIcon = document.getElementById("play-icon")!;
+    const pauseIcon = document.getElementById("pause-icon")!;
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--color);
-      animation: pulse 2s infinite;
-    }
+    player = new Spotify.Player({
+      name: "Pachehitster Spotify Player",
+      getOAuthToken: cb => {
+        cb(token);
+      },
+      volume: 0.5,
+    });
 
-    @keyframes pulse {
-      0%,
-      100% {
-        opacity: 1;
+    // Ready
+    player.addListener("ready", async ({ device_id }: { device_id: string }) => {
+      console.log("Player ready with device ID:", device_id);
+      statusText.textContent = "Ready to play";
+      statusDot.classList.remove("error");
+
+      if (trackId) {
+        await playTrack(device_id, token, trackId);
+      } else {
+        // add a short delay to allow Spotify internal initialization stability
+        setTimeout(() => transferPlayback(device_id, token), 300);
       }
-      50% {
-        opacity: 0.5;
-      }
-    }
+      console.log("Playback started");
+    });
 
-    .status-dot.error {
-      background: #e74c3c;
-      animation: none;
-    }
+    async function playTrack(deviceId: any, token: string, trackId: string) {
+      const playUrl = `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`;
 
-    #status-text {
-      font-size: 0.875rem;
-      color: #a0a0a0;
-    }
+      const body = {
+        uris: [`spotify:track:${trackId}`],
+      };
 
-    /* Vinyl Animation */
-    .player-visual {
-      padding-bottom: 2rem;
-    }
-
-    .vinyl-container {
-      position: relative;
-    }
-
-    .vinyl {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: linear-gradient(
-        135deg,
-        #1a1a1a 0%,
-        #2a2a2a 50%,
-        #1a1a1a 100%
-      );
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow:
-        0 0 0 3px #333,
-        0 0 0 6px #222,
-        0 20px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    .vinyl.spinning {
-      animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .vinyl-inner {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--color) 0%, var(--color-darker) 100%);
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Controls */
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .control-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: #fff;
-      transition: all 0.2s ease;
-    }
-
-    .control-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.05);
-    }
-
-    .control-btn.small {
-      width: 40px;
-      height: 40px;
-      background: transparent;
-      color: #666;
-    }
-
-    .control-btn.small:hover {
-      color: #fff;
-      background: transparent;
-    }
-
-    .control-btn.small.active {
-      color: var(--color);
-    }
-
-    .control-btn.play {
-      width: 64px;
-      height: 64px;
-      background: var(--color);
-    }
-
-    .control-btn.play:hover {
-      background: var(--color);
-    }
-
-    /* Volume */
-    .volume-container {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      width: 100%;
-      color: #666;
-    }
-
-    .volume-slider {
-      flex: 1;
-      height: 4px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #fff;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-
-    .volume-slider::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #a0a0a0;
-      padding: 0.75rem 1.5rem;
-      font-size: 0.875rem;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-secondary:hover {
-      border-color: rgba(255, 255, 255, 0.4);
-      color: #fff;
-    }
-  </style>
-
-  <script is:inline>
-    let player = null;
-    let isPlaying = false;
-    let accessToken = null;
-    let sdkReady = false;
-    const trackId = document.getElementById("app").dataset.trackId;
-
-    // Fetch token from server endpoint. Returns a string token or null.
-    async function getAccessToken() {
       try {
-        const res = await fetch("/api/spotify/token");
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data.token || data.accessToken || null;
-      } catch (err) {
-        console.error("getAccessToken error:", err);
-        return null;
-      }
-    }
-
-    // Disconnect player
-    function disconnect() {
-      if (player) {
-        player.disconnect();
-        player = null;
-      }
-      accessToken = null;
-      window.location.href = "/login?from=/track/" + trackId;
-    }
-
-    // Transfer playback to this device
-    async function transferPlayback(deviceId, token) {
-      try {
-        await fetch("https://api.spotify.com/v1/me/player", {
+        const response = await fetch(playUrl, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            device_ids: [deviceId],
-            play: false,
-          }),
+          body: JSON.stringify(body),
         });
-        console.log("Playback transferred");
+
+        if (response.status === 204) {
+          console.log("Playback started successfully");
+        } else {
+          const errorData = await response.json();
+          console.error("Failed to start playback", errorData);
+        }
       } catch (error) {
-        console.error("Transfer failed:", error);
+        console.error("Error playing track", error);
       }
     }
 
-    // Initialize Spotify Player — expects a resolved token string
-    function initializePlayer(token) {
-      if (!token) {
-        console.error("initializePlayer called without token");
-        return;
-      }
+    // Not Ready
+    player.addListener("not_ready", () => {
+      console.log("Device not ready");
+      statusText.textContent = "Device offline";
+      statusDot.classList.add("error");
+    });
 
-      console.log("Initializing player with token");
+    // Player state changed
+    player.addListener("player_state_changed", (state: { paused: boolean }) => {
+      if (!state) return;
 
-      const statusText = document.getElementById("status-text");
-      const statusDot = document.querySelector(".status-dot");
-      const vinyl = document.getElementById("vinyl");
-      const playIcon = document.getElementById("play-icon");
-      const pauseIcon = document.getElementById("pause-icon");
+      isPlaying = !state.paused;
 
-      player = new Spotify.Player({
-        name: "Astro Spotify Player",
-        getOAuthToken: (cb) => {
-          cb(token);
-        },
-        volume: 0.5,
-      });
-
-      // Ready
-      player.addListener("ready", async ({ device_id }) => {
-        console.log("Player ready with device ID:", device_id);
-        deviceId = device_id;
-        statusText.textContent = "Ready to play";
-        statusDot.classList.remove("error");
-
-        if (trackId) {
-          await playTrack(device_id, token, trackId);
-        } else {
-          // add a short delay to allow Spotify internal initialization stability
-          setTimeout(() => transferPlayback(device_id, token), 300);
-        }
-        console.log("Playback started");
-      });
-
-      async function playTrack(deviceId, token, trackId) {
-        const playUrl = `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`;
-
-        const body = {
-          uris: [`spotify:track:${trackId}`],
-        };
-
-        try {
-          const response = await fetch(playUrl, {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          });
-
-          if (response.status === 204) {
-            console.log("Playback started successfully");
-          } else {
-            const errorData = await response.json();
-            console.error("Failed to start playback", errorData);
-          }
-        } catch (error) {
-          console.error("Error playing track", error);
-        }
-      }
-
-      // Not Ready
-      player.addListener("not_ready", ({ device_id }) => {
-        console.log("Device not ready");
-        statusText.textContent = "Device offline";
-        statusDot.classList.add("error");
-      });
-
-      // Player state changed
-      player.addListener("player_state_changed", (state) => {
-        if (!state) return;
-
-        isPlaying = !state.paused;
-
-        if (isPlaying) {
-          playIcon.classList.add("hidden");
-          pauseIcon.classList.remove("hidden");
-          vinyl.classList.add("spinning");
-          statusText.textContent = "Playing";
-        } else {
-          playIcon.classList.remove("hidden");
-          pauseIcon.classList.add("hidden");
-          vinyl.classList.remove("spinning");
-          statusText.textContent = "Paused";
-        }
-      });
-
-      // Errors
-      player.addListener("initialization_error", ({ message }) => {
-        console.error("Init error:", message);
-        statusText.textContent = "Init error";
-        statusDot.classList.add("error");
-      });
-
-      player.addListener("authentication_error", ({ message }) => {
-        console.error("Auth error:", message);
-        statusText.textContent = "Auth error";
-        statusDot.classList.add("error");
-        setTimeout(() => disconnect(), 2000);
-      });
-
-      player.addListener("account_error", ({ message }) => {
-        console.error("Account error:", message);
-        statusText.textContent = "Premium required";
-        statusDot.classList.add("error");
-      });
-
-      player.connect().then((success) => {
-        console.log("Player connected:", success);
-      });
-      player.addListener("autoplay_failed", () => {
-        console.log("Autoplay is not allowed by the browser autoplay rules");
-      });
-    }
-
-    // SDK callback — mark sdkReady and initialize if we already have token
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      console.log("Spotify SDK Ready");
-      sdkReady = true;
-      if (accessToken && !player) {
-        initializePlayer(accessToken);
-      }
-    };
-
-    // Boot sequence: wait for DOM, then fetch token, update UI, and init player if SDK ready.
-    async function initApp() {
-      const playerScreen = document.getElementById("player-screen");
-      const disconnectBtn = document.getElementById("disconnect-btn");
-      const playBtn = document.getElementById("play-btn");
-      const prevBtn = document.getElementById("prev-btn");
-      const nextBtn = document.getElementById("next-btn");
-      const shuffleBtn = document.getElementById("shuffle-btn");
-      const repeatBtn = document.getElementById("repeat-btn");
-      const volumeSlider = document.getElementById("volume-slider");
-
-      // Event Listeners
-      disconnectBtn.addEventListener("click", disconnect);
-
-      playBtn.addEventListener("click", () => {
-        if (player) player.togglePlay();
-      });
-
-      prevBtn.addEventListener("click", () => {
-        if (player) player.previousTrack();
-      });
-
-      nextBtn.addEventListener("click", () => {
-        if (player) player.nextTrack();
-      });
-
-      shuffleBtn.addEventListener("click", function () {
-        this.classList.toggle("active");
-      });
-
-      repeatBtn.addEventListener("click", function () {
-        this.classList.toggle("active");
-      });
-
-      volumeSlider.addEventListener("input", (e) => {
-        const volume = e.target.value / 100;
-        if (player) player.setVolume(volume);
-      });
-
-      accessToken = await getAccessToken();
-
-      if (accessToken) {
-        console.log("Token found, showing player screen");
-        playerScreen.classList.remove("hidden");
-
-        // Initialize immediately if SDK is ready
-        if (sdkReady) {
-          console.log("SDK already loaded, initializing");
-          initializePlayer(accessToken);
-        } else {
-          console.log("Waiting for SDK to load...");
-        }
+      if (isPlaying) {
+        playIcon.classList.add("hidden");
+        pauseIcon.classList.remove("hidden");
+        vinyl.classList.add("spinning");
+        statusText.textContent = "Playing";
       } else {
-        console.log("No token, showing login screen");
-        loginScreen.classList.remove("hidden");
-        playerScreen.classList.add("hidden");
+        playIcon.classList.remove("hidden");
+        pauseIcon.classList.add("hidden");
+        vinyl.classList.remove("spinning");
+        statusText.textContent = "Paused";
       }
+    });
+
+    // Errors
+    player.addListener("initialization_error", ({ message }: { message: string }) => {
+      console.error("Init error:", message);
+      statusText.textContent = "Init error";
+      statusDot.classList.add("error");
+    });
+
+    player.addListener("authentication_error", ({ message }: { message: string }) => {
+      console.error("Auth error:", message);
+      statusText.textContent = "Auth error";
+      statusDot.classList.add("error");
+      setTimeout(() => disconnect(), 2000);
+    });
+
+    player.addListener("account_error", ({ message }: { message: string }) => {
+      console.error("Account error:", message);
+      statusText.textContent = "Premium required";
+      statusDot.classList.add("error");
+    });
+
+    player.connect().then((success: boolean) => {
+      console.log("Player connected:", success);
+    });
+    player.addListener("autoplay_failed", () => {
+      console.log("Autoplay is not allowed by the browser autoplay rules");
+    });
+  }
+
+  // SDK callback — mark sdkReady and initialize if we already have token
+  window.onSpotifyWebPlaybackSDKReady = () => {
+    console.log("Spotify SDK Ready");
+    sdkReady = true;
+    if (accessToken && !player) {
+      initializePlayer(accessToken);
     }
+  };
 
-    document.addEventListener("DOMContentLoaded", initApp);
-  </script>
+  // Boot sequence: wait for DOM, then fetch token, update UI, and init player if SDK ready.
+  async function initApp() {
+    const playerScreen = document.getElementById("player-screen")!;
+    const disconnectBtn = document.getElementById("disconnect-btn")!;
+    const playBtn = document.getElementById("play-btn")!;
+    const prevBtn = document.getElementById("prev-btn")!;
+    const nextBtn = document.getElementById("next-btn")!;
+    const shuffleBtn = document.getElementById("shuffle-btn")!;
+    const repeatBtn = document.getElementById("repeat-btn")!;
+    const volumeSlider = document.getElementById("volume-slider")!;
 
-  <!-- Load Spotify SDK AFTER our callback is defined -->
-  <script src="https://sdk.scdn.co/spotify-player.js"></script>
-</Layout>
+    // Event Listeners
+    disconnectBtn.addEventListener("click", disconnect);
+
+    playBtn.addEventListener("click", () => {
+      if (player) player.togglePlay();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (player) player.previousTrack();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (player) player.nextTrack();
+    });
+
+    shuffleBtn.addEventListener("click", function () {
+      this.classList.toggle("active");
+    });
+
+    repeatBtn.addEventListener("click", function () {
+      this.classList.toggle("active");
+    });
+
+    volumeSlider.addEventListener("input", (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const volume: number = parseInt(target.value) / 100;
+      if (player) {
+        player.setVolume(volume);
+      }
+    });
+
+    accessToken = await getAccessToken();
+
+    if (accessToken) {
+      console.log("Token found, showing player screen");
+      playerScreen.classList.remove("hidden");
+
+      // Initialize immediately if SDK is ready
+      if (sdkReady) {
+        console.log("SDK already loaded, initializing");
+        initializePlayer(accessToken);
+      } else {
+        console.log("Waiting for SDK to load...");
+      }
+    } else {
+      console.log("No token, showing login screen");
+      playerScreen.classList.add("hidden");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", initApp);
+</script>
+
+<!-- Load Spotify SDK AFTER our callback is defined -->
+<script is:inline src="https://sdk.scdn.co/spotify-player.js"></script>
