@@ -45,16 +45,26 @@ import Layout from "../layouts/Layout.astro";
 <script>
   import jsQR from "jsqr";
   const videoElem = document.getElementById("qr-video") as HTMLVideoElement;
-  
+  let canvas: OffscreenCanvas | null = null;
+  let ctx: OffscreenCanvasRenderingContext2D | null = null;
+
   document.addEventListener("DOMContentLoaded", async () => {
-    
     const constraints = await getBackCameraConstraints();
 
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then((stream) => {
         videoElem.srcObject = stream;
-        videoElem.play().then(() => scanQRCode());
+        videoElem.play().then(() => {
+          canvas = new OffscreenCanvas(
+            videoElem.videoWidth,
+            videoElem.videoHeight,
+          );
+          ctx = canvas.getContext("2d", {
+            willReadFrequently: true,
+          })!;
+          scanQRCode();
+        });
       })
       .catch((err) => {
         console.error(`An error occurred trying to open the video: ${err}`);
@@ -63,26 +73,43 @@ import Layout from "../layouts/Layout.astro";
 
   async function getBackCameraConstraints(): Promise<MediaStreamConstraints> {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
-    console.log('Available cameras:', videoDevices);
-
-    let backCamera = videoDevices.find(device => 
-      device.label.toLowerCase().includes('back') ||
-      device.label.toLowerCase().includes('environment') ||
-      device.label.toLowerCase().includes('rear')
+    const videoDevices = devices.filter(
+      (device) => device.kind === "videoinput",
     );
 
-    return backCamera 
-      ? { video: { deviceId: { exact: backCamera.deviceId } } }
-      : { video: { facingMode: 'environment' } };
+    console.log("Available cameras:", videoDevices);
+
+    let backCamera = videoDevices.find(
+      (device) =>
+        device.label.toLowerCase().includes("back") ||
+        device.label.toLowerCase().includes("environment") ||
+        device.label.toLowerCase().includes("rear"),
+    );
+
+    return backCamera
+      ? {
+          video: {
+            deviceId: { exact: backCamera.deviceId },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30 } 
+          },
+        }
+      : {
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30 } 
+          },
+        };
   }
 
   async function scanQRCode() {
     const imageData = await getImageData(videoElem);
-    
+
     const code = jsQR(imageData.data, imageData.width, imageData.height, {
-      inversionAttempts: "dontInvert",
+      inversionAttempts: "attemptBoth",
     });
 
     if (code && code.data) {
@@ -97,16 +124,8 @@ import Layout from "../layouts/Layout.astro";
     requestAnimationFrame(scanQRCode);
   }
 
-  async function getImageData(videoElem: HTMLVideoElement): Promise<ImageData> {
-    const bitmap = await createImageBitmap(videoElem);
-    
-    const canvas = new OffscreenCanvas(
-      videoElem.videoWidth,
-      videoElem.videoHeight,
-    );
-
-    const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(bitmap, 0, 0);
-    return ctx.getImageData(0, 0, canvas.width, canvas.height);
+  function getImageData(videoElem: HTMLVideoElement): ImageData {
+    ctx!.drawImage(videoElem, 0, 0);
+    return ctx!.getImageData(0, 0, canvas!.width, canvas!.height);
   }
 </script>
