@@ -105,6 +105,7 @@ if (!json.token) {
           />
         </div>
 
+        <a class="next-btn" href="/qr-scanner">Seguent canço</a>
         <button id="disconnect-btn" class="btn-secondary">Disconnect</button>
       </div>
     </section>
@@ -266,6 +267,22 @@ if (!json.token) {
 
   .control-btn.play:hover {
     background: var(--color);
+  }
+
+  .next-btn {
+    display: inline-block;
+    background: var(--color);
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 50px;
+    cursor: pointer;
+  }
+
+  .next-btn:hover {
+    transform: scale(1.05);
   }
 
   /* Volume */
