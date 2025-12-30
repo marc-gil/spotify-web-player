@@ -46,10 +46,13 @@ import Layout from "../layouts/Layout.astro";
 <script>
   import jsQR from "jsqr";
   const videoElem = document.getElementById("qr-video") as HTMLVideoElement;
+  
+  document.addEventListener("DOMContentLoaded", async () => {
+    
+    const constraints = await getBackCameraConstraints();
 
-  document.addEventListener("DOMContentLoaded", () => {
     navigator.mediaDevices
-      .getUserMedia({ video: true })
+      .getUserMedia(constraints)
       .then((stream) => {
         videoElem.srcObject = stream;
         videoElem.play().then(() => scanQRCode());
@@ -58,6 +61,23 @@ import Layout from "../layouts/Layout.astro";
         console.error(`An error occurred trying to open the video: ${err}`);
       });
   });
+
+  async function getBackCameraConstraints(): Promise<MediaStreamConstraints> {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+    console.log('Available cameras:', videoDevices);
+
+    let backCamera = videoDevices.find(device => 
+      device.label.toLowerCase().includes('back') ||
+      device.label.toLowerCase().includes('environment') ||
+      device.label.toLowerCase().includes('rear')
+    );
+
+    return backCamera 
+      ? { video: { deviceId: { exact: backCamera.deviceId } } }
+      : { video: { facingMode: 'environment' } };
+  }
 
   async function scanQRCode() {
     const imageData = await getImageData(videoElem);
